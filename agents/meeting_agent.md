@@ -1,4 +1,4 @@
-# skr_meeting_agent (회의록·기여도 에이전트) — 담당: 팀원 B (Orchestrate 화면, 노코드)
+# tp_meeting_agent (회의록·기여도 에이전트) — 담당: 팀원 B (Orchestrate 화면, 노코드)
 Orchestrate 화면에서 만든다. 13:30에 고친 최종본을 이 파일에도 반영한다.
 
 ## Description
