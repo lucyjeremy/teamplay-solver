@@ -22,7 +22,8 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 - 가상환경은 프로젝트 폴더의 `.venv` (Python 3.12). Orchestrate에서 도구가 실행되는 환경이 Python 3.12이므로 로컬도 3.12를 쓴다. 명령을 실행하기 전에 `.venv\Scripts\activate` 상태인지 확인한다.
 - ADK(`ibm-watsonx-orchestrate`)는 이미 설치돼 있다. 다시 설치하지 않는다.
 - Orchestrate 연결(`orchestrate env add`, `orchestrate env activate`)은 사용자가 직접 터미널에서 한다. API 키를 묻거나 출력하지 않는다.
-- 원격 연결은 2시간이 지나면 만료된다. orchestrate 명령이 인증 오류를 내면 사용자에게 "`orchestrate env activate <환경 이름> --api-key <키>`를 다시 실행해 주세요"라고 알린다.
+- 원격 연결은 2시간이 지나면 만료된다. orchestrate 명령이 인증 오류를 내면 사용자에게 "`orchestrate env activate hack --api-key <키>`를 다시 실행해 주세요"라고 알린다.
+- 모델 id는 사용자가 `orchestrate models list`에서 고른 이름을 그대로 쓴다. 직접 지어내지 않는다.
 
 ## 도구 만드는 방식
 - Python 도구로 만든다. 파일 하나에 도구 하나: `tools/find_common_slots.py`, `tools/backward_schedule.py`.
@@ -54,21 +55,28 @@ description: |
   (agents/schedule_agent.md의 Description 그대로)
 instructions: |
   (agents/schedule_agent.md의 Instructions 그대로)
-llm: <사용자가 알려준 모델 id>
+llm: <사용자가 models list에서 고른 모델 id>
 style: react_core
 tools:
   - find_common_slots
   - backward_schedule
 ```
-총괄은 tools 대신 `collaborators:`에 skr_schedule_agent와 skr_meeting_agent의 실제 이름을 넣는다.
+총괄은 tools 대신 `collaborators:`에 두 에이전트의 **실제 name**을 넣는다.
 
-## 명령어 (문서 기준)
-- 도구 등록: `orchestrate tools import -k python -f tools/find_common_slots.py -r requirements.txt` (도구마다 한 번)
+## skr_meeting_agent의 실제 name 찾기 (총괄 만들기 전에 반드시)
+- skr_meeting_agent는 팀원이 Orchestrate 화면에서 만든다. 화면에 보이는 이름과 내부 name이 다를 수 있다.
+- `orchestrate agents list -v` 를 실행한다 (모든 에이전트의 상세 정보가 JSON으로 나온다).
+- JSON에서 skr_meeting_agent에 해당하는 항목의 `"name"` 값을 그대로 collaborators에 쓴다. 추측하지 않는다.
+- 그다음 백업으로 `orchestrate agents export -n <그 name> -k native -o agents/skr_meeting_agent.yaml --agent-only` 를 실행해 저장소에 남긴다.
+
+## 명령어 (공식 문서 기준)
+- 도구 등록: `orchestrate tools import -k python -f tools/find_common_slots.py -r requirements.txt` (도구마다 한 번, `-r requirements.txt` 항상 붙임)
 - 확인: `orchestrate tools list`
 - 에이전트 등록: `orchestrate agents import -f agents/skr_schedule_agent.yaml` (등록하면 초안 상태)
-- 확인: `orchestrate agents list`
-- 배포: `orchestrate agents deploy -n <에이전트 이름>` (배포해야 웹 채팅에 나옴. Developer Edition이면 배포 없이 초안으로 나오고 deploy는 오류)
-- 명령 옵션이 다르면 `--help`로 확인해서 맞춘다.
+- 수정: 같은 name으로 YAML을 고쳐 `orchestrate agents import -f` 를 다시 실행하면 덮어쓴다.
+- 확인: `orchestrate agents list` (자세히: `orchestrate agents list -v`)
+- 배포: `orchestrate agents deploy -n <에이전트 name>` (배포해야 웹 채팅에 나옴. Developer Edition이면 배포 없이 초안으로 나오고 deploy는 오류)
+- 명령 옵션이 다르다는 오류가 나면 `<명령> --help`로 확인해서 맞춘다.
 
 ## 각 단계 끝에
 무엇을 만들었는지 3줄 요약, 그다음 git commit 후 push (.env 제외).
