@@ -5,9 +5,9 @@
 팀원 가능 시간과 회의록을 넣으면 회의 시간·역할·일정을 짜고, 기여도를 추적해 독촉 메시지와 교수님 제출용 기여도 보고서까지 써주는 watsonx Orchestrate 멀티 에이전트.
 
 ## 구조
-- teamplay_supervisor (총괄) → schedule_agent, meeting_agent에 일을 나눔
-- schedule_agent: 도구 find_common_slots, backward_schedule (Bob으로 Python 제작)
-- meeting_agent: 지시문만으로 회의 정리·기여도·독촉 메시지·보고서 (노코드)
+- skr_supervisor (총괄) → skr_schedule_agent, skr_meeting_agent에 일을 나눔
+- skr_schedule_agent: 도구 find_common_slots, backward_schedule (Bob으로 Python 제작)
+- skr_meeting_agent: 지시문만으로 회의 정리·기여도·독촉 메시지·보고서 (노코드)
 
 ## 폴더
 - data/ : 가상 팀원 4명(가은·나은·다은·라은) 가능 시간, 강점, 과제 공지, 회의록 2개

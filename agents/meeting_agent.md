@@ -1,4 +1,4 @@
-# meeting_agent (회의록·기여도 에이전트) — 담당: 송아연
+# skr_meeting_agent (회의록·기여도 에이전트) — 담당: 송아연
 Orchestrate 화면에서 만들고, 고친 최종본을 이 파일에도 반영하기
 
 ## Description

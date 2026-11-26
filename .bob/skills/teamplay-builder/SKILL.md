@@ -1,11 +1,15 @@
 ---
 name: teamplay-builder
-description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고, watsonx Orchestrate에 연결·등록하고, 에이전트(schedule_agent, teamplay_supervisor)를 만들 때 사용한다. 이 폴더에서 도구, 테스트, Orchestrate 연결, 에이전트 YAML, 등록 요청이 오면 항상 이 스킬을 따른다.
+description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고, watsonx Orchestrate에 연결·등록하고, 에이전트(skr_schedule_agent, skr_supervisor)를 만들 때 사용한다. 이 폴더에서 도구, 테스트, Orchestrate 연결, 에이전트 YAML, 등록 요청이 오면 항상 이 스킬을 따른다.
 ---
 
 # teamplay-builder
 
 팀원 가능 시간과 회의록을 받아 팀플을 돕는 watsonx Orchestrate 멀티 에이전트를 만든다.
+
+## 이름 규칙
+- 다른 팀과 이름이 겹치지 않게 에이전트 이름에는 팀 접두어 `skr_`를 붙인다: skr_schedule_agent, skr_meeting_agent, skr_supervisor.
+- 도구 이름(find_common_slots, backward_schedule)은 그대로 둔다. 같은 이름의 도구가 이미 있다고 나오면 앞에 `skr_`를 붙이고 에이전트 YAML과 instructions의 도구 이름도 같이 바꾼다.
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`, `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`
@@ -42,7 +46,7 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 2. Agent: 도구와 테스트를 만들고, 테스트가 통과할 때까지 고친 뒤 결과를 표로 보여준다.
 3. 연결: 가상환경에 ADK(`ibm-watsonx-orchestrate`)를 설치하고, `.env`의 주소와 API 키로 `orchestrate env` 명령을 써서 해커톤 Orchestrate 환경에 연결하고 활성화한다. 명령 사용법은 --help로 먼저 확인. Windows PowerShell에서 가상환경 활성화가 막히면 원인을 설명하고 현재 사용자 범위에서만 해결한다.
 4. 등록: `orchestrate tools import -k python -f tools/<파일>.py` (필요하면 -r requirements.txt). 등록 후 `orchestrate tools list`로 확인.
-5. 에이전트: `agents/schedule_agent.md` 문구로 `agents/schedule_agent.yaml`(spec_version v1, kind native)을 만들고 `orchestrate agents import`로 등록. llm은 사용자가 알려준 모델.
-6. 총괄: 먼저 `orchestrate agents list`로 meeting_agent의 실제 내부 이름을 확인한 뒤, `agents/supervisor.md` 문구로 `agents/teamplay_supervisor.yaml`(collaborators: schedule_agent, <meeting_agent의 실제 이름>)을 만들고 등록.
+5. 에이전트: `agents/schedule_agent.md` 문구로 `agents/skr_schedule_agent.yaml`(spec_version v1, kind native)을 만들고 `orchestrate agents import`로 등록. llm은 사용자가 알려준 모델.
+6. 총괄: 먼저 `orchestrate agents list`로 skr_meeting_agent의 실제 내부 이름을 확인한 뒤, `agents/supervisor.md` 문구로 `agents/skr_supervisor.yaml`(collaborators: skr_schedule_agent, <skr_meeting_agent의 실제 이름>)을 만들고 등록.
 7. 배포: 필요하면 세 에이전트를 배포(deploy)해서 채팅 화면에서 쓸 수 있게 한다.
 8. 각 단계가 끝나면 무엇을 만들었는지 3줄로 요약한다.

@@ -1,4 +1,4 @@
-# schedule_agent (일정·역할 에이전트) — 담당: 김준영
+# skr_schedule_agent (일정·역할 에이전트) — 담당: 김준영
 tools: find_common_slots, backward_schedule
 
 ## Description
