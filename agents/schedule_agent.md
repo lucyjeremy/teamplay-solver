@@ -1,4 +1,4 @@
-# skr_schedule_agent (일정·역할 에이전트) — 담당: 김준영
+# skr_schedule_agent (일정·역할 에이전트) — 담당: 팀원 A (Bob + Python 도구)
 tools: find_common_slots, backward_schedule
 
 ## Description
