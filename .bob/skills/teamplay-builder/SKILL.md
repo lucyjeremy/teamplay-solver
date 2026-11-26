@@ -10,7 +10,7 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 ## 이름 규칙
 - 에이전트 이름에는 팀 접두어 `tp_`: tp_schedule_agent, tp_meeting_agent, tp_supervisor.
 - 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면 앞에 `tp_`를 붙이고 에이전트 YAML과 instructions의 도구 이름도 같이 바꾼다.
-- 에이전트 이름이 이미 있다고 나오면(다른 팀이 같은 이름을 씁) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
+- 에이전트 이름이 이미 있다고 나오면(다른 팀이 같은 이름을 씀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`(JSON), `data/availability.txt`(글 형식), `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`, `data/kakao_chat.txt`
@@ -81,3 +81,4 @@ tools:
 
 ## 각 단계 끝에
 무엇을 만들었는지 3줄 요약, 그다음 git commit 후 push (.env 제외).
+push가 인증 오류나 저장소 없음 오류를 내면 다시 시도하지 말고 한 번만 알린 뒤 다음 단계로 간다 (파일은 노트북에 이미 저장돼 있다).
