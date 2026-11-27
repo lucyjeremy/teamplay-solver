@@ -17,14 +17,15 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 - 에이전트 문구: `agents/schedule_agent.md`, `agents/meeting_agent.md`, `agents/supervisor.md` — Description과 Instructions를 바꾸지 말고 그대로 쓴다
 - 정답표: `answers.md`, 데모 입력: `demo_inputs.txt`
 - 만들 코드: `tools/` (도구), `tests/` (테스트), `agents/*.yaml` (에이전트)
-- 비밀 값: `.env` (저장소에 올리지 않음)
+- 비밀 값: `key.txt`, `.env` (읽지 않고, 저장소에 올리지 않음)
 
 ## 환경 (Windows 노트북)
-- 환경 설정은 행사 실습 안내를 따른다. 가상환경은 프로젝트 폴더의 `.venv` (Python 3.12). Orchestrate에서 도구가 실행되는 환경이 Python 3.12이므로 로컬도 3.12를 쓴다. 명령을 실행하기 전에 `.venv\Scripts\activate` 상태인지 확인한다.
-- `orchestrate` 명령이 없으면 혼자 설치하지 말고, `.venv`에 `pip install ibm-watsonx-orchestrate`로 설치해도 되는지 사용자에게 먼저 묻는다.
-- Orchestrate 연결(`orchestrate env add`, `orchestrate env activate`)은 사용자가 직접 터미널에서 한다. API 키를 묻거나 출력하지 않는다.
-- 원격 연결은 2시간이 지나면 만료된다. orchestrate 명령이 인증 오류를 내면 사용자에게 "`orchestrate env activate hack --api-key <키>`를 다시 실행해 주세요"라고 알린다.
+- 이 폴더는 행사 실습 때 Bob의 **watsonx Orchestrate ADK 확장**이 만든 워크스페이스다 (venv/, workspace_config.yaml, key.txt, models/ 등). 상태표시줄에 `ADK: ✅`가 보이면 Orchestrate에 연결된 상태다.
+- 가상환경은 확장이 만든 `venv` 폴더를 그대로 쓴다. 새 가상환경을 만들거나 Python을 따로 설치하지 않는다. `orchestrate` 명령이 안 잡히면 혼자 설치하지 말고 사용자에게 알린다.
+- 연결과 API 키는 확장이 관리한다. `orchestrate env add`/`env activate`를 실행하지 않는다. `key.txt`와 API 키는 읽거나 출력하지 않는다.
+- orchestrate 명령이 인증 오류를 내면 더 시도하지 말고 멈춘 뒤 "ADK 확장에서 API 키를 다시 넣어 주세요"라고 알린다.
 - 모델 id는 사용자가 `orchestrate models list`에서 고른 이름을 그대로 쓴다. 직접 지어내지 않는다.
+- 실습에서 만든 다른 파일(예: email_helper 에이전트)은 건드리지 않는다. 이 프로젝트 요청에는 다른 스킬(wxo-builder 등)보다 이 스킬을 우선한다.
 
 ## 도구 만드는 방식
 - Python 도구로 만든다. 파일 하나에 도구 하나: `tools/find_common_slots.py`, `tools/backward_schedule.py`.
@@ -87,5 +88,4 @@ tools:
 - 명령 옵션이 다르다는 오류가 나면 `<명령> --help`로 확인해서 맞춘다.
 
 ## 각 단계 끝에
-무엇을 만들었는지 3줄 요약, 그다음 git commit 후 push (.env 제외).
-push가 인증 오류나 저장소 없음 오류를 내면 다시 시도하지 말고 한 번만 알린 뒤 다음 단계로 간다 (파일은 노트북에 이미 저장돼 있다).
+무엇을 만들었는지 3줄 요약만 한다. git commit·push는 사용자가 요청할 때만 한다 (이 폴더는 git 저장소가 아닐 수 있다).
