@@ -1,22 +1,21 @@
 ---
 name: teamplay-builder
-description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고, watsonx Orchestrate에 등록하고, 에이전트(tp_schedule_agent, tp_supervisor)를 만들고 배포할 때 사용한다. 이 폴더에서 도구, 테스트, 에이전트 YAML, 등록, 배포 요청이 오면 항상 이 스킬을 따른다.
+description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고, watsonx Orchestrate에 등록할 때 사용한다. 이 폴더에서 도구, 테스트, 도구 등록 요청이 오면 항상 이 스킬을 따른다.
 ---
 
 # teamplay-builder
 
-팀원 가능 시간과 회의 기록을 받아 팀플을 돕는 watsonx Orchestrate 멀티 에이전트를 만든다.
+팀플을 돕는 watsonx Orchestrate 에이전트 tp_teamplay(1개)가 쓸 Python 도구 2개를 만들고 등록한다. 에이전트 자체는 팀원이 Orchestrate 화면에서 만들고 관리하므로 Bob은 에이전트를 만들거나 import하지 않는다.
 
 ## 이름 규칙
-- 에이전트 이름에는 팀 접두어 `tp_`: tp_schedule_agent, tp_meeting_agent, tp_supervisor.
-- 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면 앞에 `tp_`를 붙이고 에이전트 YAML과 instructions의 도구 이름도 같이 바꾼다.
-- 에이전트 이름이 이미 있다고 나오면(다른 팀이 같은 이름을 씀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
+- 에이전트 이름: tp_teamplay (화면에서 팀원이 관리. Bob은 건드리지 않는다).
+- 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면(다른 팀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`(JSON), `data/availability.txt`(글 형식), `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`, `data/kakao_chat.txt`
-- 에이전트 문구: `agents/schedule_agent.md`, `agents/meeting_agent.md`, `agents/supervisor.md` — Description과 Instructions를 바꾸지 말고 그대로 쓴다
+- 에이전트 문구: `agents/teamplay_agent.md` (팀원이 화면에 붙여 넣는 원본. 수정하지 않는다)
 - 정답표: `answers.md`, 데모 입력: `demo_inputs.txt`
-- 만들 코드: `tools/` (도구), `tests/` (테스트), `agents/*.yaml` (에이전트)
+- 만들 코드: `tools/` (도구), `tests/` (테스트)
 - 비밀 값: `key.txt`, `.env` (읽지 않고, 저장소에 올리지 않음)
 
 ## 환경 (Windows 노트북)
@@ -55,36 +54,9 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
   - 날짜 형식이 틀렸거나 N이 3보다 작으면(작업마다 하루씩도 안 돌아감): 예외 없이 schedule은 [], message에 이유
 - 정답 (2026-11-27 → 2026-12-10): 자료조사 11/27~12/1(5일), 발표 초안 12/2~12/4(3일), PPT 제작 12/5~12/8(4일), 발표 리허설 12/9(1일)
 
-## 에이전트 YAML 형식
-```yaml
-spec_version: v1
-kind: native
-name: tp_schedule_agent
-description: |
-  (agents/schedule_agent.md의 Description 그대로)
-instructions: |
-  (agents/schedule_agent.md의 Instructions 그대로)
-llm: <사용자가 models list에서 고른 모델 id>
-style: react_core
-tools:
-  - find_common_slots
-  - backward_schedule
-```
-총괄은 tools 대신 `collaborators:`에 두 에이전트의 **실제 name**을 넣는다.
-
-## tp_meeting_agent의 실제 name 찾기 (총괄 만들기 전에 반드시)
-- tp_meeting_agent는 팀원이 Orchestrate 화면에서 만든다. 화면에 보이는 이름과 내부 name이 다를 수 있다.
-- `orchestrate agents list -v` 를 실행한다 (모든 에이전트의 상세 정보가 JSON으로 나온다).
-- JSON에서 tp_meeting_agent에 해당하는 항목의 `"name"` 값을 그대로 collaborators에 쓴다. 추측하지 않는다.
-- 그다음 백업으로 `orchestrate agents export -n <그 name> -k native -o agents/tp_meeting_agent.yaml --agent-only` 를 실행해 저장소에 남긴다.
-
 ## 명령어 (공식 문서 기준)
 - 도구 등록: `orchestrate tools import -k python -f tools/find_common_slots.py -r requirements.txt` (도구마다 한 번, `-r requirements.txt` 항상 붙임)
 - 확인: `orchestrate tools list`
-- 에이전트 등록: `orchestrate agents import -f agents/tp_schedule_agent.yaml` (등록하면 초안 상태)
-- 수정: 같은 name으로 YAML을 고쳐 `orchestrate agents import -f` 를 다시 실행하면 덮어쓴다.
-- 확인: `orchestrate agents list` (자세히: `orchestrate agents list -v`)
-- 배포: `orchestrate agents deploy -n <에이전트 name>` (배포해야 웹 채팅에 나옴. Developer Edition이면 배포 없이 초안으로 나오고 deploy는 오류)
 - 명령 옵션이 다르다는 오류가 나면 `<명령> --help`로 확인해서 맞춘다.
 
 ## 각 단계 끝에
