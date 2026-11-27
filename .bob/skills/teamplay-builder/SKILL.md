@@ -5,15 +5,15 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 
 # teamplay-builder
 
-팀플을 돕는 watsonx Orchestrate 에이전트 tp_teamplay(1개)가 쓸 Python 도구 2개를 만들고 등록한다. 에이전트 자체는 팀원이 Orchestrate 화면에서 만들고 관리하므로 Bob은 에이전트를 만들거나 import하지 않는다.
+팀플을 돕는 watsonx Orchestrate 멀티 에이전트(총괄 tp_supervisor + tp_topic, tp_plan, tp_track, tp_message, tp_report) 중 tp_plan이 쓸 Python 도구 2개를 만들고 등록한다. 에이전트는 팀원들이 Orchestrate 화면에서 만들고 관리하므로 Bob은 에이전트를 만들거나 import하지 않는다.
 
 ## 이름 규칙
-- 에이전트 이름: tp_teamplay (화면에서 팀원이 관리. Bob은 건드리지 않는다).
+- 에이전트 이름: tp_supervisor, tp_topic, tp_plan, tp_track, tp_message, tp_report (화면에서 팀원이 관리. Bob은 건드리지 않는다).
 - 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면(다른 팀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`(JSON), `data/availability.txt`(글 형식), `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`, `data/kakao_chat.txt`
-- 에이전트 문구: `agents/teamplay_agent.md` (팀원이 화면에 붙여 넣는 원본. 수정하지 않는다)
+- 에이전트 문구: `agents/*_agent.md`, `agents/supervisor.md` (팀원이 화면에 붙여 넣는 원본. 수정하지 않는다)
 - 정답표: `answers.md`, 데모 입력: `demo_inputs.txt`
 - 만들 코드: `tools/` (도구), `tests/` (테스트)
 - 비밀 값: `key.txt`, `.env` (읽지 않고, 저장소에 올리지 않음)
