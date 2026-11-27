@@ -7,6 +7,6 @@
 - 코드를 바꾸면 테스트를 다시 돌리고 `answers.md` 정답과 비교한다.
 - 크레딧 절약: 같은 문제를 3번 고쳤는데도 테스트나 명령이 계속 실패하면 더 시도하지 말고 멈춘 뒤, 오류 문구와 원인 추측을 사용자에게 보여준다. 요청받지 않은 기능이나 파일은 만들지 않는다.
 - `data/`, `agents/*.md`, `answers.md`는 사용자가 요청할 때만 수정한다.
-- 에이전트(tp_supervisor, tp_topic, tp_plan, tp_track, tp_message)는 팀원이 Orchestrate 화면에서 관리한다. Bob은 에이전트를 만들거나 import·수정하지 않는다. Bob의 일은 도구 2개 만들기·테스트·등록뿐이다.
+- 에이전트(tp_supervisor, topic_helper_1, tp_plan, tp_track, tp_message)는 사용자가 요청할 때만 만든다. 에이전트 하나당 New task 하나로 나눠서 만든다. 이름·Description·Instructions는 `agents/*.md`에 적힌 것을 글자 그대로 쓰고, 바꾸거나 지어내지 않는다. 이미 있는 에이전트는 덮어쓰기 전에 먼저 물어본다.
 - API 키, 인스턴스 주소 같은 비밀 값은 코드나 YAML에 직접 쓰지 않는다. `key.txt`·`.env`는 읽거나 출력하지 않고 절대 커밋하지 않는다.
 - 파일을 지우거나 큰 구조를 바꿀 때는 먼저 물어본다.

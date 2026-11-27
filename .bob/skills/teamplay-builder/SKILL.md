@@ -1,19 +1,19 @@
 ---
 name: teamplay-builder
-description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고, watsonx Orchestrate에 등록할 때 사용한다. 이 폴더에서 도구, 테스트, 도구 등록 요청이 오면 항상 이 스킬을 따른다.
+description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_common_slots, backward_schedule)를 만들고 테스트하고 watsonx Orchestrate에 등록할 때, 그리고 agents/*.md 문구로 에이전트를 만들 때 사용한다. 이 폴더에서 도구, 테스트, 도구 등록, 에이전트 만들기 요청이 오면 항상 이 스킬을 따른다.
 ---
 
 # teamplay-builder
 
-팀플을 돕는 watsonx Orchestrate 멀티 에이전트(총괄 tp_supervisor + tp_topic, tp_plan, tp_track, tp_message) 중 tp_plan이 쓸 Python 도구 2개를 만들고 등록한다. 에이전트는 팀원들이 Orchestrate 화면에서 만들고 관리하므로 Bob은 에이전트를 만들거나 import하지 않는다.
+팀플을 돕는 watsonx Orchestrate 멀티 에이전트(총괄 tp_supervisor + topic_helper_1, tp_plan, tp_track, tp_message) 중 tp_plan이 쓸 Python 도구 2개를 만들고 등록한다. 사용자가 요청하면 `agents/*.md` 문구 그대로 에이전트도 만든다 (아래 "에이전트 만들기").
 
 ## 이름 규칙
-- 에이전트 이름: tp_supervisor, tp_topic, tp_plan, tp_track, tp_message (화면에서 팀원이 관리. Bob은 건드리지 않는다).
+- 에이전트 이름: tp_supervisor, topic_helper_1, tp_plan, tp_track, tp_message. 이름은 각 `agents/*.md` 첫 줄에 적힌 것 그대로.
 - 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면(다른 팀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`(JSON), `data/availability.txt`(글 형식), `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`, `data/kakao_chat.txt`
-- 에이전트 문구: `agents/*_agent.md`, `agents/supervisor.md` (팀원이 화면에 붙여 넣는 원본. 수정하지 않는다)
+- 에이전트 문구: `agents/*_agent.md`, `agents/supervisor.md` (에이전트의 원본. 수정하지 않는다)
 - 정답표: `answers.md`, 데모 입력: `demo_inputs.txt`
 - 만들 코드: `tools/` (도구), `tests/` (테스트)
 - 비밀 값: `key.txt`, `.env` (읽지 않고, 저장소에 올리지 않음)
@@ -53,6 +53,14 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 - 출력(`-> dict`, 항상 이 모양): `{"schedule": [{"작업", "시작일", "종료일", "일수"}, ...], "message": str}`
   - 날짜 형식이 틀렸거나 N이 3보다 작으면(작업마다 하루씩도 안 돌아감): 예외 없이 schedule은 [], message에 이유
 - 정답 (2026-11-27 → 2026-12-10): 자료조사 11/27~12/1(5일), 발표 초안 12/2~12/4(3일), PPT 제작 12/5~12/8(4일), 발표 리허설 12/9(1일)
+
+## 에이전트 만들기 (사용자가 요청할 때만)
+- 에이전트 하나당 New task 하나. 한 task에서 여러 에이전트를 만들지 않는다.
+- 이름, Description, Instructions는 해당 `agents/*.md`의 첫 줄 이름, `## Description` 아래, `## Instructions` 아래를 글자 그대로 쓴다. 줄이거나 다듬지 않는다.
+- 모델: `groq/openai/gpt-oss-120b`
+- 연결할 것: tp_plan은 도구 find_common_slots·backward_schedule / tp_track은 Knowledge에 `data/course_guide.txt` / tp_supervisor는 협력 에이전트 topic_helper_1, tp_plan, tp_track, tp_message (이 4개가 먼저 있어야 함) / topic_helper_1, tp_message는 연결 없음
+- 같은 이름이 이미 있으면 덮어쓰지 말고 멈춘 뒤 물어본다. import 명령이나 YAML 형식이 헷갈리면 `orchestrate agents import --help`로 확인한다.
+- 만든 뒤 `orchestrate agents list`로 확인하고, 화면 Draft Preview에서 `demo_inputs.txt`의 해당 데모로 시험해 보라고 사용자에게 알린다.
 
 ## 명령어 (공식 문서 기준)
 - 도구 등록: `orchestrate tools import -k python -f tools/find_common_slots.py -r requirements.txt` (도구마다 한 번, `-r requirements.txt` 항상 붙임)

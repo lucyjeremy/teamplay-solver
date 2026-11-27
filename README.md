@@ -6,7 +6,7 @@
 
 ## 구조 (총괄 1 + 기능 에이전트 4)
 - tp_supervisor (총괄): 요청을 보고 아래 4개에게 맡김
-- tp_topic: 팀플 주제 추천
+- topic_helper_1: 팀플 주제 추천
 - tp_plan: 회의 시간·역할·일정 (도구 find_common_slots, backward_schedule, Bob으로 Python 제작)
 - tp_track: 회의 정리 + 현재 팀 기여도 리포트 (Knowledge: data/course_guide.txt)
 - tp_message: 일을 안 한 팀원에게 보낼 메시지
