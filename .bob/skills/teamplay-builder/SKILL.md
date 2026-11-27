@@ -9,7 +9,7 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 
 ## 이름 규칙
 - 에이전트 이름: tp_supervisor, topic_helper_1, tp_plan, tp_track, tp_message. 이름은 각 `agents/*.md` 첫 줄에 적힌 것 그대로.
-- 도구 이름(find_common_slots, backward_schedule)은 그대로. 같은 이름의 도구가 이미 있다고 나오면(다른 팀) 덮어쓰지 말고 멈춘 뒤 사용자에게 알린다.
+- 도구 이름(find_common_slots, backward_schedule)은 그대로. 이미 우리가 등록한 도구를 고칠 때는 같은 명령으로 다시 import해서 덮어쓴다 (오류가 나면 `orchestrate tools import --help`로 확인하고, 그래도 안 되면 멈추고 알린다).
 
 ## 파일 위치
 - 샘플 데이터: `data/availability.json`(JSON), `data/availability.txt`(글 형식), `data/strengths.json`, `data/meeting_1.txt`, `data/meeting_2.txt`, `data/kakao_chat.txt`
@@ -40,19 +40,22 @@ description: "팀플 해결사" 해커톤 프로젝트의 Python 도구(find_com
 - 입력: availability (str), min_minutes (int, 기본 60), top_n (int, 기본 3)
 - availability는 두 형식을 모두 받는다: (1) `data/availability.json` 형식 JSON 문자열 (2) `data/availability.txt` 형식 글 ("가은: 월 13~18시, 화 10~12시" 한 줄에 한 명, "13:30~15시"처럼 분이 있어도 해석).
 - 요일별로 모든 팀원의 가능 시간이 겹치는 구간을 찾는다. min_minutes보다 짧으면 제외. 긴 순서, 같으면 월→금.
-- 출력(`-> dict`, 항상 이 모양): `{"slots": [{"요일", "시작", "끝", "분"}, ...], "message": str}`
+- 출력(`-> dict`, 항상 이 모양): `{"slots": [{"요일", "시작", "끝", "분"}, ...], "table": str, "message": str}`
   - 정상: slots에 Top N, message는 빈 문자열
+  - table: 주간 가능 시간표 마크다운 문자열. 첫 줄 `| 요일 | 10시 | 11시 | … |` (가장 이른 시작 시각부터 가장 늦은 끝 시각 직전까지 1시간 단위, "10시" = 10:00-11:00), 행은 월~금. 칸은 그 1시간을 통째로 가능한 인원 수 n으로 `🟩n`(전원) / `🟨n`(전원-1) / `⬜n`(그 외). 표 아래 줄에 `🟩 전원 가능 · 🟨 1명 빠짐 · ⬜ 2명 이상 빠짐`. 겹치는 구간이 없을 때도 table은 만든다. 해석할 수 없을 때만 빈 문자열.
   - 겹치는 구간이 없음: slots는 [], message에 "모두 되는 시간이 없습니다. 가장 많은 인원(N명)이 되는 시간: …"
   - 해석할 수 없음: 예외를 내지 않고 slots는 [], message에 "가능 시간 형식을 확인해 주세요 (예: 가은: 월 13~18시)"
 - 정답 (두 형식 모두): 1위 수 18:00-20:00(120분), 2위 월 16:00-17:00(60분), 3위 목 20:00-21:00(60분).
+- table 정답: `answers.md`의 "데모 1-0 주간 가능 시간표"와 칸마다 같아야 한다 (🟩는 월 16시, 수 18·19시, 목 20시, 금 14시 다섯 칸뿐).
 
 ## 도구2: backward_schedule
-- 입력: start_date (str), deadline (str), 둘 다 YYYY-MM-DD
-- 발표 전날 = "발표 리허설"(1일). 시작일~리허설 전날 일수 N. "자료조사" = 반올림(N*0.4), "발표 초안" = 반올림(N*0.25), "PPT 제작" = 나머지. 이 순서로 날짜 배정.
+- 입력: start_date (str), deadline (str), 둘 다 YYYY-MM-DD, research_ratio (float, 기본 0.4, 0.2~0.6 밖이면 schedule [] + message)
+- 발표 전날 = "발표 리허설"(1일). 시작일~리허설 전날 일수 N. "자료조사" = 반올림(N*research_ratio), "발표 초안" = 반올림(N*0.25), "PPT 제작" = 나머지. 이 순서로 날짜 배정.
 - 반올림은 `int(x + 0.5)`로 한다. Python의 `round()`는 2.5를 2로 만들기 때문에 쓰지 않는다 (심사위원이 다른 날짜로 시험해도 상식대로 나오게).
 - 출력(`-> dict`, 항상 이 모양): `{"schedule": [{"작업", "시작일", "종료일", "일수"}, ...], "message": str}`
-  - 날짜 형식이 틀렸거나 N이 3보다 작으면(작업마다 하루씩도 안 돌아감): 예외 없이 schedule은 [], message에 이유
+  - 날짜 형식이 틀렸거나 N이 3보다 작거나, 계산한 작업 중 하루도 안 되는 것이 있으면: 예외 없이 schedule은 [], message에 이유
 - 정답 (2026-11-27 → 2026-12-10): 자료조사 11/27~12/1(5일), 발표 초안 12/2~12/4(3일), PPT 제작 12/5~12/8(4일), 발표 리허설 12/9(1일)
+- 정답 (같은 날짜, research_ratio=0.5): 자료조사 11/27~12/2(6일), 발표 초안 12/3~12/5(3일), PPT 제작 12/6~12/8(3일), 발표 리허설 12/9(1일)
 
 ## 에이전트 만들기 (사용자가 요청할 때만)
 - 에이전트 하나당 New task 하나. 한 task에서 여러 에이전트를 만들지 않는다.
